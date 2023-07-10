@@ -1,4 +1,4 @@
-[[package]]
+[package]]
 category = "main"
 description = "Composable command line interface toolkit"
 name = "click"

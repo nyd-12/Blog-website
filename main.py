@@ -9,13 +9,17 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
+import os
+import smtplib
 from sqlalchemy import Table, Column, Integer, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.environ.get('secret_key')
 ckeditor = CKEditor(app)
 Bootstrap(app)
+MY_EMAIL = os.environ.get('email')
+PASSWORD = os.environ.get('password')
 
 ##CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
@@ -163,9 +167,18 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/contact")
+@app.route("/contact", methods=["GET", "POST"])
 def contact():
-    return render_template("contact.html")
+    if request.method == "POST":
+        with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
+            print("inside")
+            connection.starttls()
+            connection.login(user=MY_EMAIL, password=PASSWORD)
+            connection.sendmail(from_addr=MY_EMAIL, to_addrs=MY_EMAIL,
+                                msg=f"Subject:Received a response on the blog site.\n\n{request.form['name']}\n"
+                                    f"{request.form['email']}\n{request.form['phone']}\n{request.form['message']}")
+        return render_template("contact.html", message_sent=True)
+    return render_template("contact.html", message_sent=False)
 
 
 @app.route("/new-post", methods=["GET", "POST"])
