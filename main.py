@@ -21,14 +21,13 @@ Bootstrap(app)
 MY_EMAIL = os.environ.get('email')
 PASSWORD = os.environ.get('password')
 
-##CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-## Creating avatar
+
 gravatar = Gravatar(app,
                     size=100,
                     rating='pg',
@@ -58,7 +57,6 @@ def admin_only(f):
     return decorated_function
 
 
-##CONFIGURE TABLES
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
